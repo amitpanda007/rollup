@@ -1,0 +1,27 @@
+<div class="content">
+<h1>Get Rollup Calculation</h1>
+
+<div class="input-area">
+    <mat-form-field appearance="fill">
+        <mat-label>Textarea</mat-label>
+        <textarea matInput rows="8" cols="100" [(ngModel)]="responseText"></textarea>
+    </mat-form-field>
+</div>
+
+<button mat-stroked-button (click)="setData()">Set Data</button>
+
+<div *ngIf="this.countries && this.countries.length > 0">
+    <h4>Select Countries</h4>
+    <mat-select class="countries" (selectionChange)="countrySelected($event)">
+        <mat-option *ngFor="let country of countries" [value]="country">
+            {{country.name}}
+        </mat-option>
+    </mat-select>
+</div>
+
+<div>
+    <p *ngIf="srRollUp">SR: <b>{{srRollUp}}</b></p>
+    <p *ngIf="rrRollUp">RR: <b>{{rrRollUp}}</b></p>
+</div>
+
+</div>

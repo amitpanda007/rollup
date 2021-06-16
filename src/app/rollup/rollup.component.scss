@@ -1,0 +1,13 @@
+.input-area {
+    display: flex;
+}
+
+::ng-deep.mat-form-field-infix {
+    width: 100% !important;
+}
+
+.countries {
+    width: 300px;
+    height: 25px;
+    background-color: gray;
+}
