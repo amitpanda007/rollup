@@ -1,13 +1,37 @@
-.input-area {
-    display: flex;
-}
-
 ::ng-deep.mat-form-field-infix {
     width: 100% !important;
+}
+
+.btn {
+    width: 7em;
+}
+
+.input-area {
+    display: inline-grid;
 }
 
 .countries {
     width: 300px;
     height: 25px;
     background-color: gray;
+}
+
+.rollups {
+    display: flex;
+    margin-top: 2em;
+}
+
+.country-rollup {
+    width: 300px;
+    border: 1px dotted gray;
+}
+
+.region-rollup {
+    width: 300px;
+    border: 1px dotted gray;
+}
+
+.worldwide-rollup {
+    width: 300px;
+    border: 1px dotted gray;
 }

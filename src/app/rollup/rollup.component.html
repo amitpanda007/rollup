@@ -1,27 +1,63 @@
 <div class="content">
-<h1>Get Rollup Calculation</h1>
+    <h1>SR/RR Rollup Calculation</h1>
 
-<div class="input-area">
-    <mat-form-field appearance="fill">
-        <mat-label>Textarea</mat-label>
-        <textarea matInput rows="8" cols="100" [(ngModel)]="responseText"></textarea>
-    </mat-form-field>
-</div>
+    <div class="input-area">
+        <mat-form-field appearance="fill">
+            <mat-label>Textarea</mat-label>
+            <textarea matInput rows="8" cols="100" [(ngModel)]="responseText"></textarea>
+        </mat-form-field>
+        <button mat-stroked-button color="primary" (click)="setData()" class="btn">Set Data</button>
+    </div>
 
-<button mat-stroked-button (click)="setData()">Set Data</button>
+    <div class="rollups">
+        <div class="country-rollup">
+            <p>Country Rollup Section</p>
+            <div *ngIf="this.countries && this.countries.length > 0">
+                <h4>Select Country</h4>
+                <mat-select class="countries" (selectionChange)="countrySelected($event)">
+                    <mat-option *ngFor="let country of countries" [value]="country">
+                        {{country.name}}
+                    </mat-option>
+                </mat-select>
+            </div>
 
-<div *ngIf="this.countries && this.countries.length > 0">
-    <h4>Select Countries</h4>
-    <mat-select class="countries" (selectionChange)="countrySelected($event)">
-        <mat-option *ngFor="let country of countries" [value]="country">
-            {{country.name}}
-        </mat-option>
-    </mat-select>
-</div>
+            <p *ngIf="srRollUp">SR:
+                <b>{{srRollUp}}</b>
+            </p>
+            <p *ngIf="rrRollUp">RR:
+                <b>{{rrRollUp}}</b>
+            </p>
+        </div>
 
-<div>
-    <p *ngIf="srRollUp">SR: <b>{{srRollUp}}</b></p>
-    <p *ngIf="rrRollUp">RR: <b>{{rrRollUp}}</b></p>
-</div>
+        <div class="region-rollup">
+            <p>Region Rollup Section</p>
+            <div *ngIf="this.regions && this.regions.length > 0">
+                <h4>Select Region</h4>
+                <mat-select class="countries" (selectionChange)="regionSelected($event)">
+                    <mat-option *ngFor="let region of regions" [value]="region">
+                        {{region.name}}
+                    </mat-option>
+                </mat-select>
+            </div>
+
+            <p *ngIf="srRegionRollUp">SR:
+                <b>{{srRegionRollUp}}</b>
+            </p>
+            <p *ngIf="rrRegionRollUp">RR:
+                <b>{{rrRegionRollUp}}</b>
+            </p>
+        </div>
+
+        <div class="worldwide-rollup">
+            <p>WorldWide Rollup Section</p>
+
+            <p *ngIf="srWWRollUp">SR:
+                <b>{{srWWRollUp}}</b>
+            </p>
+            <p *ngIf="rrWWRollUp">RR:
+                <b>{{rrWWRollUp}}</b>
+            </p>
+        </div>
+    </div>
 
 </div>
