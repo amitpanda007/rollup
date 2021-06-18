@@ -11,7 +11,7 @@
 
     <div class="rollups">
         <div class="country-rollup">
-            <p>Country Rollup Section</p>
+            <p class="heading">Country Rollup Section</p>
             <div *ngIf="this.countries && this.countries.length > 0">
                 <h4>Select Country</h4>
                 <mat-select class="countries" (selectionChange)="countrySelected($event)">
@@ -27,10 +27,12 @@
             <p *ngIf="rrRollUp">RR:
                 <b>{{rrRollUp}}</b>
             </p>
+
+            <p *ngIf="countryError" class="error"><b>Error Calculating Rollup</b></p>
         </div>
 
         <div class="region-rollup">
-            <p>Region Rollup Section</p>
+            <p class="heading">Region Rollup Section</p>
             <div *ngIf="this.regions && this.regions.length > 0">
                 <h4>Select Region</h4>
                 <mat-select class="countries" (selectionChange)="regionSelected($event)">
@@ -46,10 +48,12 @@
             <p *ngIf="rrRegionRollUp">RR:
                 <b>{{rrRegionRollUp}}</b>
             </p>
+
+            <p *ngIf="regionError" class="error"><b>Error Calculating Rollup</b></p>
         </div>
 
         <div class="worldwide-rollup">
-            <p>WorldWide Rollup Section</p>
+            <p class="heading">WorldWide Rollup Section</p>
 
             <p *ngIf="srWWRollUp">SR:
                 <b>{{srWWRollUp}}</b>

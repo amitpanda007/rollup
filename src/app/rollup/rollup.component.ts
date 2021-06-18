@@ -17,6 +17,9 @@ export class RollUpComponent implements OnInit{
   public srWWRollUp: number;
   public rrWWRollUp: number;
 
+  public countryError = false;
+  public regionError = false;
+
   ngOnInit(): void {
     this.responseText = "";
     this.countries = [];
@@ -26,6 +29,13 @@ export class RollUpComponent implements OnInit{
   constructor() {}
 
   setData() {
+    this.srRollUp = 0;
+    this.rrRollUp = 0;
+    this.srRegionRollUp = 0;
+    this.rrRegionRollUp = 0;
+    this.countryError = false;
+    this.regionError = false;
+
     const response = JSON.parse(this.responseText);
     console.log(response);
 
@@ -52,9 +62,81 @@ export class RollUpComponent implements OnInit{
         regionNames.push(reg.geographyName);
       }
     });
+
+    this.calculateWWRollUp();
   }
 
+
+  calculateWWRollUp() {
+    let wwCycleTime;
+    let wwActiveSites;
+
+    const response = JSON.parse(this.responseText);
+    response.serviceResponse.studyPlanDetails.geoList.geography.forEach(geo => {
+      if(geo.geographyName == "Worldwide" && geo.isCohortCountry == false) {
+        const countryARC = geo.planParamsDetails.ARC;
+        const countrySites = geo.planParamsDetails.numSites;
+        const countryFSI = geo.planParamsDetails.FSI;
+        const countryPLSR = geo.planParamsDetails.LSR;
+
+        wwCycleTime = this.daysBetween(new Date(countryPLSR) , new Date(countryFSI)) + 1;
+        wwActiveSites = Math.floor(countrySites * (countryARC / 100));
+      }
+    });
+
+
+    const cohortInfo = [];
+    response.serviceResponse.studyPlanDetails.geoList.geography.forEach(geo => {
+      if(geo.geographyName == "Worldwide" && geo.isCohortCountry == true) {
+        const cohortFSI = geo.planParamsDetails.FSI;
+        const cohortLSR = geo.planParamsDetails.PLSR;
+        const cohortSites = geo.planParamsDetails.numSites;
+        const cohortARC = geo.planParamsDetails.ARC;
+        const cohortSR = geo.planParamsDetails.SR;
+        const cohortRR = geo.planParamsDetails.RR;
+
+        const cohortCycleTime = this.daysBetween(new Date(cohortLSR) , new Date(cohortFSI)) + 1;
+        const cohortActiveSite = Math.floor(cohortSites * (cohortARC / 100));
+
+        const coh = {
+          name: geo.cohortName,
+          cycleTime: cohortCycleTime,
+          sr: cohortSR,
+          rr: cohortRR,
+          activeSites: cohortActiveSite
+        }
+        cohortInfo.push(coh);
+      }
+    });
+
+    //Calculate Final
+    let srNumerator = 0;
+    let rrNumerator = 0;
+    cohortInfo.forEach(coh => {
+      console.log(coh);
+      if(coh.sr && coh.cycleTime && coh.activeSites) {
+        const srCalc: any = (parseFloat(coh.sr) * parseFloat(coh.cycleTime) * parseFloat(coh.activeSites));
+        srNumerator += srCalc;
+      }
+      if(coh.rr && coh.cycleTime && coh.activeSites) {
+        const rrCalc: any = (parseFloat(coh.rr) * parseFloat(coh.cycleTime) * parseFloat(coh.activeSites));
+        rrNumerator += rrCalc;
+      }
+      console.log(`SR-Numerator ${srNumerator}, RR-Numerator ${rrNumerator}`);  
+    });
+
+    let denominator = wwActiveSites * wwCycleTime;
+    console.log(`Denominator ${denominator}`);
+
+
+    this.srWWRollUp = srNumerator / denominator;
+    this.rrWWRollUp = rrNumerator / denominator
+    console.log(`SR ROLLUP: ${this.srWWRollUp}, RR ROLLUP: ${this.rrWWRollUp}`);
+  }
+
+
   countrySelected($event) {
+    this.countryError = false;
     let countryCycleTime;
     let countryActiveSites;
 
@@ -63,7 +145,6 @@ export class RollUpComponent implements OnInit{
     console.log(selectedCountry);
 
     const response = JSON.parse(this.responseText);
-
     response.serviceResponse.studyPlanDetails.geoList.geography.forEach(geo => {
       if(geo.geographyName == selectedCountry.name && geo.isCohortCountry == false) {
         const countryName = geo.geographyName;
@@ -115,7 +196,7 @@ export class RollUpComponent implements OnInit{
         const rrCalc: any = (parseFloat(coh.rr) * parseFloat(coh.cycleTime) * parseFloat(coh.activeSites));
         rrNumerator += rrCalc;
       }
-      
+      console.log(`SR-Numerator ${srNumerator}, RR-Numerator ${rrNumerator}`);  
     });
 
     let denominator = countryActiveSites * countryCycleTime;
@@ -123,12 +204,17 @@ export class RollUpComponent implements OnInit{
 
 
     this.srRollUp = srNumerator / denominator;
-    this.rrRollUp = rrNumerator / denominator
+    this.rrRollUp = rrNumerator / denominator;
+    if(isNaN(this.srRollUp) || isNaN(this.rrRollUp) || isNaN(denominator)) {
+      console.log("CODE NOT REACHING");
+      this.countryError = true;
+    }
     console.log(`SR ROLLUP: ${this.srRollUp}, RR ROLLUP: ${this.rrRollUp}`);
   }
 
 
   regionSelected($event) {
+    this.regionError = false;
     let regionCycleTime;
     let regionActiveSites;
 
@@ -192,7 +278,7 @@ export class RollUpComponent implements OnInit{
         const rrCalc: any = (parseFloat(coh.rr) * parseFloat(coh.cycleTime) * parseFloat(coh.activeSites));
         rrNumerator += rrCalc;
       }
-      console.log(`SR-Numerator ${srNumerator}, RR-Numerator ${rrNumerator}`);  
+      console.log(`SR-Numerator ${srNumerator}, RR-Numerator ${rrNumerator}`);
     });
 
     let denominator = regionActiveSites * regionCycleTime;
@@ -201,6 +287,9 @@ export class RollUpComponent implements OnInit{
 
     this.srRegionRollUp = srNumerator / denominator;
     this.rrRegionRollUp = rrNumerator / denominator
+    if(isNaN(this.srRegionRollUp) || isNaN(this.rrRegionRollUp) || isNaN(denominator)) {
+      this.regionError = true;
+    }
     console.log(`SR Region ROLLUP: ${this.srRegionRollUp}, RR Region ROLLUP: ${this.rrRegionRollUp}`);
   }
 
